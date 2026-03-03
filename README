@@ -1,0 +1,73 @@
+# 📊 FinAudit - Sistema de Auditoria Financeira
+
+Um CRUD Financeiro completo com foco em Conciliação, Controle de Operações e Logs de Auditoria rigorosos. Desenvolvido como prova de conceito para uma arquitetura monolítica segura.
+
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.0-092E20?logo=django&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite&logoColor=white)
+
+---
+
+## 🎯 Objetivo do Projeto (Contexto Acadêmico / PMBOK)
+
+Este sistema foi arquitetado para demonstrar os seguintes conceitos críticos de engenharia de software e segurança:
+
+* **Princípio do Menor Privilégio:** Separação estrita de perfis (Admin vs. Operator). Apenas administradores possuem o poder de estornar operações.
+* **Atomicidade (ACID):** Todas as transações financeiras são vinculadas atomicamente aos seus respectivos logs de auditoria. Se o log falhar, a operação sofre *rollback*.
+* **Integridade Referencial:** Restrições de chave estrangeira (Foreign Keys) impedem a deleção de usuários que possuam histórico de operações financeiras no banco de dados.
+* **Rastreabilidade (Audit Log):** Sistema *append-only* (apenas inserção) que registra quem, quando e o que foi alterado no sistema, garantindo um histórico imutável das ações.
+
+---
+
+## 🚀 Como Executar o Projeto (Via Docker)
+
+O projeto está totalmente conteinerizado para facilitar a execução em qualquer ambiente.
+
+### Pré-requisitos
+* [Docker](https://www.docker.com/) e Docker Compose instalados.
+
+### Passos para rodar
+1. Clone este repositório ou baixe a pasta do projeto.
+2. Abra o terminal na raiz do projeto (onde está o arquivo `docker-compose.yml`).
+3. Execute o comando de build e inicialização:
+   ```bash
+   docker compose up -d --build
+Acesse o sistema no seu navegador: http://localhost:8000
+
+(Nota: Como o banco de dados local db.sqlite3 está mapeado como volume no Docker, todos os dados persistirão mesmo se o container for desligado).
+
+🔐 Credenciais de Acesso (Contas de Teste)
+O sistema já possui o banco de dados populado com dois perfis distintos para avaliação das regras de negócio e restrições de tela.
+
+🛡️ Perfil: Administrador
+Possui acesso total. Pode visualizar o dashboard, listar operações, criar novos aportes/débitos e estornar operações concluídas.
+
+Usuário: admin
+
+Senha: admin123
+
+👤 Perfil: Operador
+Perfil de linha de frente. Pode visualizar o dashboard, listar operações e criar novos aportes/débitos. Não possui permissão para estornar operações (o botão é bloqueado na interface e na API).
+
+Usuário: operador
+
+Senha: op123
+
+🛠️ Tecnologias Utilizadas
+Backend / Frontend: Django (Python) - Arquitetura Monolítica.
+
+Banco de Dados: SQLite (com suporte nativo a UUIDs).
+
+Estilização: Tailwind CSS (via CDN).
+
+Gráficos: Chart.js (Dashboard em tempo real).
+
+Infraestrutura: Docker & Docker Compose.
+
+📝 Notas Adicionais sobre Segurança
+Cálculo de Saldo em Tempo Real: O saldo do dashboard não é uma coluna armazenada no banco de dados, sendo calculado em tempo real através da agregação de Créditos e Débitos para evitar inconsistências.
+
+Proteção contra Deleção (Soft Delete / Reverse): O sistema não possui rotas de método DELETE para as operações financeiras, cumprindo a regra de conformidade contábil. Operações incorretas são estornadas (status alterado para REVERSED), mantendo o histórico intacto.
+
+Nota sobre Imutabilidade Avançada: O script original de bloqueio via Trigger SQL (audit_immutability.sql) foi projetado para PostgreSQL (plpgsql). Como a versão atual de entrega utiliza SQLite para portabilidade, a imutabilidade está sendo garantida de forma robusta pela camada de aplicação (ORM do Django).
