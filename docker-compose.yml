@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: finaudit_web
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
